@@ -61,7 +61,8 @@ LOCAL_SRC_FILES := \
     twrp-functions.cpp \
     twrpDigestDriver.cpp \
     openrecoveryscript.cpp \
-    tarWrite.c
+    tarWrite.c \
+    twrpAdbBuFifo.cpp
 
 #MultiROM
 ifeq ($(TARGET_RECOVERY_IS_MULTIROM), true)
