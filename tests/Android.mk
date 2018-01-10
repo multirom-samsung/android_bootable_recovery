@@ -16,12 +16,6 @@
 
 LOCAL_PATH := $(call my-dir)
 
-ifdef project-path-for
-    RECOVERY_PATH := $(call project-path-for,recovery)
-else
-    RECOVERY_PATH := bootable/recovery
-endif
-
 # Unit tests
 include $(CLEAR_VARS)
 LOCAL_CFLAGS := -Werror
@@ -47,7 +41,7 @@ LOCAL_SRC_FILES := \
     unit/zip_test.cpp \
     unit/ziputil_test.cpp
 
-LOCAL_C_INCLUDES := $(RECOVERY_PATH)
+LOCAL_C_INCLUDES := $(commands_recovery_local_path)
 LOCAL_SHARED_LIBRARIES := liblog
 include $(BUILD_NATIVE_TEST)
 
@@ -105,7 +99,7 @@ endif
 
 LOCAL_MODULE := recovery_component_test
 LOCAL_COMPATIBILITY_SUITE := device-tests
-LOCAL_C_INCLUDES := $(RECOVERY_PATH)
+LOCAL_C_INCLUDES := $(commands_recovery_local_path)
 LOCAL_SRC_FILES := \
     component/applypatch_test.cpp \
     component/bootloader_message_test.cpp \
