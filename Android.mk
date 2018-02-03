@@ -449,6 +449,10 @@ LOCAL_CFLAGS += -DTW_DEFAULT_ROTATION=0
     endif
 endif
 
+ifneq ($(TW_CLOCK_OFFSET),)
+	LOCAL_CFLAGS += -DTW_CLOCK_OFFSET=$(TW_CLOCK_OFFSET)
+endif
+
 LOCAL_ADDITIONAL_DEPENDENCIES += \
     dump_image \
     erase_image \
