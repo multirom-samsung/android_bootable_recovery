@@ -1503,12 +1503,16 @@ bool MultiROM::verifyZIP(const std::string& file, int &verify_status)
 		return false;
 	}
 	std::vector<Certificate> loadedKeys;
+#ifdef USE_OLD_VERIFIER
+	int ret_val = verify_file(map.addr, map.length); 
+#else
 	if (!load_keys("/res/keys", loadedKeys)) {
 		LOGINFO("Failed to load keys");
 		gui_err("verify_zip_fail=Zip signature verification failed!");
 		return -1;
 	}
 	int ret_val = verify_file(map.addr, map.length, loadedKeys, NULL);
+#endif
 	sysReleaseMap(&map);
 	if (ret_val != VERIFY_SUCCESS) {
 		LOGERR("Zip signature verification failed: %i\n", ret_val);
