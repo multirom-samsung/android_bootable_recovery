@@ -841,20 +841,28 @@ static bool MakeMultiROMRecoveryFstab(void)
 	FILE *fstabOUT;
 	char fstab_line[MAX_FSTAB_LINE_LENGTH];
 
-	if (rename("/etc/recovery.fstab", "/etc/recovery.fstab.bak") < 0) {
-		LOGERR("Could not rename /etc/recovery.fstab to /etc.recovery.fstab.bak!\n");
+	std::string fstab_filename = "/etc/twrp.fstab";
+	std::string fstab_filename_bak = "/etc/twrp.fstab.bak";
+	if (!TWFunc::Path_Exists(fstab_filename)) {
+		fstab_filename = "/etc/recovery.fstab";
+		fstab_filename_bak = "/etc/twrp.fstab.bak";
+	}
+
+
+	if (rename(fstab_filename.c_str(), fstab_filename_bak.c_str()) < 0) {
+		LOGERR("Could not rename %s to %s!\n", fstab_filename.c_str(), fstab_filename_bak.c_str());
 		return false;
 	}
 
-	fstabIN = fopen("/etc/recovery.fstab.bak", "rt");
+	fstabIN = fopen(fstab_filename_bak.c_str(), "rt");
 	if (!fstabIN) {
-		LOGERR("Could not open /etc/recovery.fstab.bak for reading!\n");
+		LOGERR("Could not open %s for reading!\n", fstab_filename_bak.c_str());
 		return false;
 	}
 
-	fstabOUT = fopen("/etc/recovery.fstab", "w");
+	fstabOUT = fopen(fstab_filename.c_str(), "w");
 	if (!fstabOUT) {
-		LOGERR("Could not open /etc/recovery.fstab for writing!\n");
+		LOGERR("Could not open %s for writing!\n", fstab_filename.c_str());
 		fclose(fstabIN);
 		return false;
 	}
@@ -1032,7 +1040,7 @@ bool MultiROM::changeMounts(std::string name)
 	PartitionManager.Output_Partition_Logging();
 
 	// SuperSU tries *very* hard to mount /data and /system, even looks through
-	// recovery.fstab and manages to mount the real /system
+	// recovery.fstab/twrp.fstab and manages to mount the real /system
 	MakeMultiROMRecoveryFstab();
 
 	// This shim prevents everything from mounting anything as read-only
@@ -1085,7 +1093,11 @@ void MultiROM::restoreMounts()
 		DataManager::SetValue("tw_storage_path", path);
 	}
 
-	system("mv /etc/recovery.fstab.bak /etc/recovery.fstab");
+	std::string fstab_filename = "/etc/twrp.fstab";
+	if (!TWFunc::Path_Exists(fstab_filename))
+		fstab_filename = "/etc/recovery.fstab";
+
+	system(("mv " + fstab_filename + ".bak " + fstab_filename).c_str());
 	system("if [ -e /sbin/mount_real ]; then mv /sbin/mount_real /sbin/mount; fi;");
 	system("if [ -e /sbin/umount_real ]; then mv /sbin/umount_real /sbin/umount; fi;");
 
