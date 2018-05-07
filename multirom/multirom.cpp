@@ -321,14 +321,21 @@ bool MultiROM::setRomsPath(std::string loc)
 	mkdir("/mnt", 0777); // in case it does not exist
 
 	char cmd[256];
-	if(loc.find("(ntfs") != std::string::npos)
-		sprintf(cmd, "ntfs-3g %s /mnt", dev.c_str());
+	if (loc.find("(ntfs") != std::string::npos && (TWFunc::Path_Exists("/sbin/ntfs-3g") || TWFunc::Path_Exists("/sbin/mount.ntfs"))) {
+		std::string ntfsmount;
+		if (TWFunc::Path_Exists("/sbin/ntfs-3g"))
+			ntfsmount = "ntfs-3g";
+		else if (TWFunc::Path_Exists("/sbin/mount.ntfs"))
+			ntfsmount = "mount.ntfs";
+
+		sprintf(cmd, "%s %s /mnt", ntfsmount.c_str(), dev.c_str());
 #ifndef TW_NO_EXFAT_FUSE
-	else if(loc.find("(exfat)") != std::string::npos)
+	} else if(loc.find("(exfat)") != std::string::npos) {
 		sprintf(cmd, "exfat-fuse -o big_writes,max_read=131072,max_write=131072,nonempty %s /mnt", dev.c_str());
 #endif
-	else
+	} else {
 		sprintf(cmd, "mount %s /mnt", dev.c_str());
+	}
 
 	if(system(cmd) != 0)
 	{

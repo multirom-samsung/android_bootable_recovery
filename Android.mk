@@ -476,7 +476,6 @@ ifeq ($(TARGET_RECOVERY_IS_MULTIROM), true)
         zip \
         gnutar \
         lz4 \
-        ntfs-3g \
         cp_xattrs \
         ls_xattrs \
         mount_shim.sh \
