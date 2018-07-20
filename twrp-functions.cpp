@@ -829,14 +829,6 @@ int TWFunc::write_file(string fn, const string& line, const char *mode) {
 }
 #endif //TARGET_RECOVERY_IS_MULTIROM
 
-bool TWFunc::Install_SuperSU(void) {
-	if (!PartitionManager.Mount_By_Path("/system", true))
-		return false;
-
-	check_and_run_script("/supersu/install-supersu.sh", "SuperSU");
-	return true;
-}
-
 bool TWFunc::Try_Decrypting_Backup(string Restore_Path, string Password) {
 	DIR* d;
 
