@@ -352,11 +352,11 @@ int main(int argc, char **argv) {
 
 	// Run any outstanding OpenRecoveryScript
 #ifndef TARGET_RECOVERY_IS_MULTIROM
-	if (DataManager::GetIntValue(TW_IS_ENCRYPTED) == 0 && (TWFunc::Path_Exists(SCRIPT_FILE_TMP) || TWFunc::Path_Exists(SCRIPT_FILE_CACHE))) {
+	if ((DataManager::GetIntValue(TW_IS_ENCRYPTED) == 0 || SkipDecryption) && (TWFunc::Path_Exists(SCRIPT_FILE_TMP) || TWFunc::Path_Exists(SCRIPT_FILE_CACHE))) {
 		OpenRecoveryScript::Run_OpenRecoveryScript();
 	}
 #else
-	if (DataManager::GetIntValue(TW_IS_ENCRYPTED) == 0)
+	if (DataManager::GetIntValue(TW_IS_ENCRYPTED) == 0 || SkipDecryption)
 	{
 		if ((TWFunc::Path_Exists(SCRIPT_FILE_TMP) || TWFunc::Path_Exists(SCRIPT_FILE_CACHE)))
 			OpenRecoveryScript::Run_OpenRecoveryScript();
