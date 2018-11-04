@@ -206,7 +206,7 @@ public:
 
 private:
 	static void findPath();
-	static bool changeMounts(std::string base);
+	static bool changeMounts(std::string base, bool needs_vendor);
 	static void restoreMounts();
 	static bool prepareZIP(std::string& file, EdifyHacker *hacker, bool& restore_script);
 	static bool verifyZIP(const std::string& file, int &verify_status);
@@ -234,7 +234,7 @@ private:
 	static void umountBaseImages(const std::string& base);
 	static bool createFakeSystemImg();
 #ifdef MR_DEVICE_HAS_VENDOR_PARTITION
-	static bool createFakeVendorImg();
+	static bool createFakeVendorImg(bool needs_vendor);
 #endif
 
 	static int system_args(const char *fmt, ...);
