@@ -2055,6 +2055,7 @@ int GUIAction::multirom_settings(std::string arg __unused)
 	DataManager::SetValue("tw_multirom_rotation", cfg.rotation);
 	DataManager::SetValue("tw_multirom_force_generic_fb", cfg.force_generic_fb);
 	DataManager::SetValue("tw_anim_duration_coef_pct", cfg.anim_duration_coef_pct);
+	DataManager::SetValue("tw_multirom_use_primary_kernel", cfg.use_primary_kernel);
 
 	DataManager::SetValue("tw_multirom_unrecognized_opts", cfg.unrecognized_opts);
 
@@ -2097,6 +2098,7 @@ int GUIAction::multirom_settings_save(std::string arg __unused)
 	cfg.rotation = DataManager::GetIntValue("tw_multirom_rotation");
 	cfg.force_generic_fb = DataManager::GetIntValue("tw_multirom_force_generic_fb");
 	cfg.anim_duration_coef_pct = DataManager::GetIntValue("tw_anim_duration_coef_pct");
+	cfg.use_primary_kernel = DataManager::GetIntValue("tw_multirom_use_primary_kernel");
 
 	cfg.unrecognized_opts = DataManager::GetStrValue("tw_multirom_unrecognized_opts");
 
