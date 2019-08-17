@@ -165,6 +165,7 @@ public:
 	static bool restorecon(std::string name);
 
 	static bool installFromFastbootImg(std::string rom, std::string file);
+	static bool installVendorFromFastbootImg(std::string rom, std::string file);
 	static bool flashZip(std::string rom, std::string file);
 	static bool flashORSZip(std::string file, int *wipe_cache);
 	static bool injectBoot(std::string img_path, bool only_if_older = false);

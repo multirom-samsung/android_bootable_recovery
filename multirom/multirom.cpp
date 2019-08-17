@@ -1462,15 +1462,33 @@ bool MultiROM::createFakeVendorImg(bool needs_vendor)
 
 #define MR_UPDATE_SCRIPT_PATH  "META-INF/com/google/android/"
 #define MR_UPDATE_SCRIPT_NAME  "META-INF/com/google/android/updater-script"
+
 #define MR_SYS_TRANS_LST_NAME  "system.transfer.list"
 #define MR_VND_TRANS_LST_NAME  "vendor.transfer.list"
 
 bool MultiROM::installFromFastbootImg(std::string rom, std::string file)
 {
-	string Command;
+	string Command, CommandClr;
 
+	CommandClr = "rm -f '" + getRomsPath() + rom + "/system.sparse.img" + "'";
 	Command = "simg2img '" + file + "' '" + getRomsPath() + rom + "/system.sparse.img" + "'";
+	LOGINFO("Clear command: '%s'\n", CommandClr.c_str());
 	LOGINFO("Flash command: '%s'\n", Command.c_str());
+	TWFunc::Exec_Cmd(CommandClr);
+	TWFunc::Exec_Cmd(Command);
+	gui_print("Image successfully installed\n");
+	return true;
+}
+
+bool MultiROM::installVendorFromFastbootImg(std::string rom, std::string file)
+{
+	string Command, CommandClr;
+
+	CommandClr = "rm -f '" + getRomsPath() + rom + "/vendor.sparse.img" + "'";
+	Command = "simg2img '" + file + "' '" + getRomsPath() + rom + "/vendor.sparse.img" + "'";
+	LOGINFO("Clear command: '%s'\n", CommandClr.c_str());
+	LOGINFO("Flash command: '%s'\n", Command.c_str());
+	TWFunc::Exec_Cmd(CommandClr);
 	TWFunc::Exec_Cmd(Command);
 	gui_print("Image successfully installed\n");
 	return true;
@@ -1499,6 +1517,8 @@ bool MultiROM::flashZip(std::string rom, std::string file)
 	if(!prepareZIP(file, &hacker, restore_script))  // may change file var
 		return false;
 
+	gui_print("Zip preparing complete.\n");
+	
 	needs_vendor = (hacker.getProcessFlags() & EDIFY_VENDOR);
 	// unblank here so we can see some progress (kinda optional)
 	blankTimer.resetTimerAndUnblank();
@@ -1530,6 +1550,24 @@ bool MultiROM::flashZip(std::string rom, std::string file)
 			goto exit;
 	}
 
+/*
+		std::string rom_storage_path = m_path;
+		translateToRealdata(rom_storage_path);
+		if(DataManager::GetIntValue("tw_multirom_wipe_system") != 0){
+			if(!createFakeSystemImg()){
+				goto exit;
+			}
+		}
+
+#ifdef MR_DEVICE_HAS_VENDOR_PARTITION
+		if(DataManager::GetIntValue("tw_multirom_wipe_vendor") != 0){
+			if(!createFakeVendorImg(needs_vendor)){
+				goto exit;
+			}
+		}
+#endif
+*/
+
 	// unblank here is necessary; if we don't bring the screen back up and the zip has an AROMA
 	// Installer, it will take over the screen and buttons and we won't be able to manually wake the screen
 	blankTimer.resetTimerAndUnblank();
@@ -1542,8 +1580,10 @@ bool MultiROM::flashZip(std::string rom, std::string file)
 #endif
 
 	DataManager::SetValue(TW_SIGNED_ZIP_VERIFY_VAR, 0);
-	status = TWinstall_zip(file.c_str(), &wipe_cache);
+	DataManager::SetValue("mr_use_zero_as_erase", MR_USE_ZERO_AS_ERASE);
+	status = TWinstall_zip(file.c_str(), &wipe_cache, DataManager::GetIntValue("tw_multirom_skip_comp_verify"));
 	DataManager::SetValue(TW_SIGNED_ZIP_VERIFY_VAR, verify_status);
+	DataManager::SetValue("mr_use_zero_as_erase", 0);
 
 	if (dp_keep_busy[0]) closedir(dp_keep_busy[0]);
 	if (dp_keep_busy[1]) closedir(dp_keep_busy[1]);
@@ -1867,41 +1907,56 @@ bool MultiROM::prepareZIP(std::string& file, EdifyHacker *hacker, bool& restore_
 		gui_print("No need to change ZIP.\n");
 
 #ifdef MR_USE_ZERO_AS_ERASE
+	system_args("rm /tmp/%s", MR_SYS_TRANS_LST_NAME);
+	system_args("rm /tmp/%s", MR_VND_TRANS_LST_NAME);
 	gui_print("Start to convert zero to erase in system.transfer.list...");
 	if(system_args("unzip %s \"%s\" -d /tmp", file.c_str(), MR_SYS_TRANS_LST_NAME) != 0){
 		gui_print("Failed to extract system.transfer.list. Or file does not exist\n");
 	} else {
-		if(system_args("sed -i \'s/erase/zero/g\' /tmp/%s", MR_SYS_TRANS_LST_NAME) != 0){
-			gui_print("Failed to convert system.transfer.list.\n");
-			goto exit;
-		}
-		if(system_args("cd /tmp && zip -u %s %s", file.c_str(), MR_SYS_TRANS_LST_NAME) != 0){
-			gui_print("Failed to update zip.\n");
-			goto exit;
+		char sysLstFile[128];
+		sprintf(sysLstFile, "/tmp/%s", MR_SYS_TRANS_LST_NAME);
+		if(access(sysLstFile, F_OK) == 0){
+			if(system_args("sed -i \'s/erase/zero/g\' /tmp/%s", MR_SYS_TRANS_LST_NAME) != 0){
+				gui_print("Failed to convert system.transfer.list.\n");
+				goto exit;
+			}
+			if(system_args("cd /tmp && zip -u \"%s\" %s", file.c_str(), MR_SYS_TRANS_LST_NAME) != 0){
+				gui_print("Failed to update zip.\n");
+				goto exit;
+			}
 		}
 	}
 	gui_print("Start to convert zero to erase in vendor.transfer.list...");
 	if(system_args("unzip %s \"%s\" -d /tmp", file.c_str(), MR_VND_TRANS_LST_NAME) != 0){
 		gui_print("Failed to extract vender.transfer.list. Or file does not exist\n");
 	} else {
-		if(system_args("sed -i \'s/erase/zero/g\' /tmp/%s", MR_VND_TRANS_LST_NAME) != 0){
-			gui_print("Failed to convert vender.transfer.list.\n");
-			goto exit;
-		}
-		if(system_args("cd /tmp && zip -u %s %s", file.c_str(), MR_VND_TRANS_LST_NAME) != 0){
-			gui_print("Failed to update zip.\n");
-			goto exit;
+		char vndLstFile[128];
+		sprintf(vndLstFile, "/tmp/%s", MR_VND_TRANS_LST_NAME);
+		if(access(vndLstFile, F_OK) == 0){
+			if(system_args("sed -i \'s/erase/zero/g\' /tmp/%s", MR_VND_TRANS_LST_NAME) != 0){
+				gui_print("Failed to convert vender.transfer.list.\n");
+				goto exit;
+			}
+			if(system_args("cd /tmp && zip -u \"%s\" %s", file.c_str(), MR_VND_TRANS_LST_NAME) != 0){
+				gui_print("Failed to update zip.\n");
+				goto exit;
+			}
 		}
 	}
+	system_args("rm /tmp/%s", MR_SYS_TRANS_LST_NAME);
+	system_args("rm /tmp/%s", MR_VND_TRANS_LST_NAME);
 #endif	
-	
+
 	return true;
 
 exit:
 	free(script_data);
+
 #ifdef MR_USE_ZERO_AS_ERASE
 	system_args("rm /tmp/%s", MR_SYS_TRANS_LST_NAME);
+	system_args("rm /tmp/%s", MR_VND_TRANS_LST_NAME);
 #endif
+
 #ifdef USE_MINZIP
 	mzCloseZipArchive(&zip);
 	sysReleaseMap(&map);
