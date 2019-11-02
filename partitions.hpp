@@ -310,6 +310,8 @@ private:
 	TWExclude backup_exclusions;                                              // Exclusions for file based backups
 	TWExclude wipe_exclusions;                                                // Exclusions for file based wipes (data/media devices only)
 	string Key_Directory;                                                     // Metadata key directory needed for mounting FBE encrypted data partitions using metadata encryption
+	string Original_Path;
+	bool Use_Original_Path;
 
 
 #ifdef TARGET_RECOVERY_IS_MULTIROM
