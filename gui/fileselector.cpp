@@ -20,7 +20,15 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <algorithm>
-
+#ifdef __ANDROID_API_M__
+#include <vector>
+#ifdef __ANDROID_API_N__
+#include <android-base/strings.h>
+#else
+#include <base/strings.h>
+#endif
+#else
+#endif
 extern "C" {
 #include "../twcommon.h"
 }
@@ -53,26 +61,7 @@ GUIFileSelector::GUIFileSelector(xml_node<>* node) : GUIScrollList(node)
 	if (child) {
 		attr = child->first_attribute("extn");
 		if (attr)
-#ifndef TARGET_RECOVERY_IS_MULTIROM
 			mExtn = attr->value();
-#else
-		{
-			std::string str = attr->value();
-			const char delimiter = ';';
-			size_t idx = 0, idx_next = 0, len;
-			do
-			{
-				idx_next = str.find(delimiter, idx+1);
-				if(idx != 0 && idx != std::string::npos)
-					++idx;
-
-				len = std::min(idx_next, str.size()) - idx;
-
-				mExtn.push_back(str.substr(idx, len));
-				idx = idx_next;
-			} while(idx != std::string::npos);
-		}
-#endif //TARGET_RECOVERY_IS_MULTIROM
 		attr = child->first_attribute("folders");
 		if (attr)
 			mShowFolders = atoi(attr->value());
@@ -320,28 +309,32 @@ int GUIFileSelector::GetFileList(const std::string folder)
 			if (mShowNavFolders || (data.fileName != "." && data.fileName != ".."))
 				mFolderList.push_back(data);
 		} else if (data.fileType == DT_REG || data.fileType == DT_LNK || data.fileType == DT_BLK) {
-#ifndef TARGET_RECOVERY_IS_MULTIROM
-			if (mExtn.empty() || (data.fileName.length() > mExtn.length() && data.fileName.substr(data.fileName.length() - mExtn.length()) == mExtn)) {
-				if (mExtn == ".ab" && twadbbu::Check_ADB_Backup_File(path))
+#ifdef __ANDROID_API_M__
+			std::vector<std::string> mExtnResults = android::base::Split(mExtn, ";");
+			for (const std::string& mExtnElement : mExtnResults)
+			{
+				std::string mExtnName = android::base::Trim(mExtnElement);
+				if (mExtnName.empty() || (data.fileName.length() > mExtnName.length() && data.fileName.substr(data.fileName.length() - mExtnName.length()) == mExtnName)) {
+					if (mExtnName == ".ab" && twadbbu::Check_ADB_Backup_File(path))
+						mFolderList.push_back(data);
+					else
+						mFileList.push_back(data);
+			}
+#else //On android 5.1 we can't use android::base::Trim and Split so just use the first extension written in the list
+			std::size_t seppos = mExtn.find_first_of(";");
+			std::string mExtnf;
+			if (seppos!=std::string::npos){
+				mExtnf = mExtn.substr(0, seppos);
+			} else {
+			mExtnf = mExtn;
+			}
+			if (mExtnf.empty() || (data.fileName.length() > mExtnf.length() && data.fileName.substr(data.fileName.length() - mExtnf.length()) == mExtnf)) {
+				if (mExtnf == ".ab" && twadbbu::Check_ADB_Backup_File(path))
 					mFolderList.push_back(data);
 				else
 					mFileList.push_back(data);
+#endif
 			}
-#else
-			if(mExtn.empty()) {
-				mFileList.push_back(data);
-			} else {
-				for(size_t i = 0; i < mExtn.size(); ++i)
-				{
-					const std::string& ext = mExtn[i];
-					if (ext.empty() || (data.fileName.length() > ext.length() && data.fileName.substr(data.fileName.length() - ext.length()) == ext))
-					{
-						mFileList.push_back(data);
-						break;
-					}
-				}
-			}
-#endif //TARGET_RECOVERY_IS_MULTIROM
 		}
 	}
 	closedir(d);
@@ -424,11 +417,7 @@ void GUIFileSelector::NotifySelect(size_t item_selected)
 				cwd += str;
 			}
 
-#ifndef TARGET_RECOVERY_IS_MULTIROM
 			if (mShowNavFolders == 0 && (mShowFiles == 0 || mExtn == ".ab")) {
-#else
-			if (mShowNavFolders == 0 && (mShowFiles == 0 || mExtn.back() == ".ab")) {
-#endif
 				// this is probably the restore list and we need to save chosen location to mVariable instead of mPathVar
 				DataManager::SetValue(mVariable, cwd);
 			} else {

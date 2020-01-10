@@ -648,10 +648,8 @@ protected:
 	std::string mPathDefault; // default value for the path if none is set in mPathVar
 #ifdef TARGET_RECOVERY_IS_MULTIROM
 	std::vector<std::string> mExcludeFiles;
-	std::vector<std::string> mExtn; // used for filtering the file list, for example, *.zip
-#else
-	std::string mExtn; // used for filtering the file list, for example, *.zip
 #endif
+	std::string mExtn; // used for filtering the file list, for example, *.zip
 	std::string mVariable; // set when the user selects an item, pull path like /path/to/foo
 	std::string mSortVariable; // data manager variable used to change the sorting of files
 	std::string mSelection; // set when the user selects an item without the full path like selecting /path/to/foo would just be set to foo
