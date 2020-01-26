@@ -281,7 +281,7 @@ TWPartition::TWPartition() {
 	Size_Raw = 0;
 
 	if(fstab_line) {
-		Process_Fstab_Line(fstab_line, true, NULL);
+		Process_Fstab_Line(fstab_line, true, NULL, false);
 		Partition_Post_Processing(true);
 	}
 #endif //TARGET_RECOVERY_IS_MULTIROM
@@ -318,7 +318,7 @@ TWPartition *TWPartition::makePartFromFstab(const char *fmt, ...)
 }
 #endif //TARGET_RECOVERY_IS_MULTIROM
 
-bool TWPartition::Process_Fstab_Line(const char *fstab_line, bool Display_Error, std::map<string, Flags_Map> *twrp_flags) {
+bool TWPartition::Process_Fstab_Line(const char *fstab_line, bool Display_Error, std::map<string, Flags_Map> *twrp_flags, bool Sar_Detect) {
 	char full_line[MAX_FSTAB_LINE_LENGTH];
 	char twflags[MAX_FSTAB_LINE_LENGTH] = "";
 	char* ptr;
@@ -355,11 +355,12 @@ bool TWPartition::Process_Fstab_Line(const char *fstab_line, bool Display_Error,
 			Mount_Point = ptr;
 			if (fstab_version == 2) {
 				additional_entry = PartitionManager.Find_Partition_By_Path(Mount_Point);
-				if (additional_entry) {
+				if (!Sar_Detect && additional_entry) {
 					LOGINFO("Found an additional entry for '%s'\n", Mount_Point.c_str());
 				}
 			}
-			LOGINFO("Processing '%s'\n", Mount_Point.c_str());
+			if(!Sar_Detect)
+				LOGINFO("Processing '%s'\n", Mount_Point.c_str());
 			Backup_Path = Mount_Point;
 			Storage_Path = Mount_Point;
 			Display_Name = ptr + 1;
@@ -456,7 +457,12 @@ bool TWPartition::Process_Fstab_Line(const char *fstab_line, bool Display_Error,
 	if (Primary_Block_Device.find("*") != string::npos)
 		Wildcard_Block_Device = true;
 
-	if (Mount_Point == "auto") {
+	if (Sar_Detect) {
+		if(Is_File_System(Fstab_File_System) && (Mount_Point == "/" || Mount_Point == "/system" || Mount_Point == "/system_root"))
+			Find_Actual_Block_Device();
+		else
+			return true;
+	} else if (Mount_Point == "auto") {
 		Mount_Point = "/auto";
 		char autoi[5];
 		sprintf(autoi, "%i", auto_index);
@@ -483,9 +489,6 @@ bool TWPartition::Process_Fstab_Line(const char *fstab_line, bool Display_Error,
 		Find_Actual_Block_Device();
 		Setup_File_System(Display_Error);
 		if (Mount_Point == "/" || Mount_Point == "/system" || Mount_Point == "/system_root") {
-			Mount_Point = PartitionManager.Get_Android_Root_Path();
-			Backup_Path = Mount_Point;
-			Storage_Path = Mount_Point;
 			Display_Name = "System";
 			Backup_Display_Name = Display_Name;
 			Storage_Name = Display_Name;
@@ -644,6 +647,19 @@ bool TWPartition::Process_Fstab_Line(const char *fstab_line, bool Display_Error,
 			TWFunc::Fixup_Time_On_Boot("/persist/time/");
 			if (!mounted)
 				UnMount(false);
+		}
+	}
+
+	if (Is_File_System(Fstab_File_System) && (Mount_Point == "/" || Mount_Point == "/system" || Mount_Point == "/system_root")) {
+		if (Sar_Detect) {
+			Mount_Point = "/s";
+			Mount_Read_Only = true;
+			Can_Be_Mounted = true;
+		} else {
+			Mount_Point = PartitionManager.Get_Android_Root_Path();
+			Backup_Path = Mount_Point;
+			Storage_Path = Mount_Point;
+			Make_Dir(Mount_Point, Display_Error);
 		}
 	}
 
@@ -3073,7 +3089,7 @@ bool TWPartition::Find_Wildcard_Block_Devices(const string& Device) {
 		TWPartition *part = new TWPartition;
 		char buffer[MAX_FSTAB_LINE_LENGTH];
 		sprintf(buffer, "%s %s-%i auto defaults defaults", item.c_str(), Mount_Point.c_str(), ++mount_point_index);
-		part->Process_Fstab_Line(buffer, false, NULL);
+		part->Process_Fstab_Line(buffer, false, NULL, false);
 		char display[MAX_FSTAB_LINE_LENGTH];
 		sprintf(display, "%s %i", Storage_Name.c_str(), mount_point_index);
 		part->Storage_Name = display;
