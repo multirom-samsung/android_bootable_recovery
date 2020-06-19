@@ -3304,7 +3304,7 @@ void MultiROM::executeCacheScripts()
 
 		if(type & MASK_ANDROID)
 		{
-			std::string orsFile = TWFunc::get_cache_dir() + "/recovery/openrecoveryscript";
+			std::string orsFile = TWFunc::get_log_dir() + "/recovery/openrecoveryscript";
 			if(stat((path + orsFile).c_str(), &info) < 0)
 				continue;
 
