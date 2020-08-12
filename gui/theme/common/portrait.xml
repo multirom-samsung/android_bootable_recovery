@@ -4357,6 +4357,13 @@
 			</text>
 
 			<button style="main_button_half_height">
+				<condition var1="tw_fm_isfolder" var2="1"/>
+				<placement x="%center_x%" y="%row12a_y%"/>
+				<text>{@fm_open_terminal_btn=Open Terminal Here}</text>
+				<action function="changeterminal">%tw_filename1%</action>
+			</button>
+
+			<button style="main_button_half_height">
 				<condition var1="tw_fm_isfolder" var2="0"/>
 				<placement x="%indent%" y="%row15a_y%"/>
 				<text>{@fm_copy_file_btn=Copy File}</text>
@@ -5040,6 +5047,7 @@
 				<actions>
 					<action function="set">tw_hide_kb=0</action>
 					<action function="key">home</action>
+					<action function="changeterminal"/>
 				</actions>
 			</button>
 
@@ -5075,6 +5083,7 @@
 				<actions>
 					<action function="set">tw_hide_kb=0</action>
 					<action function="key">back</action>
+					<action function="changeterminal"/>
 				</actions>
 			</button>
 
@@ -5083,6 +5092,7 @@
 				<actions>
 					<action function="set">tw_hide_kb=0</action>
 					<action function="page">main</action>
+					<action function="changeterminal"/>
 				</actions>
 			</action>
 
@@ -5091,6 +5101,7 @@
 				<actions>
 					<action function="set">tw_hide_kb=0</action>
 					<action function="page">advanced</action>
+					<action function="changeterminal"/>
 				</actions>
 			</action>
 
