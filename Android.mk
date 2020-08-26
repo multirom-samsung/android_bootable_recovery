@@ -543,7 +543,7 @@ ifeq ($(TARGET_RECOVERY_IS_MULTIROM), true)
     #LOCAL_C_INCLUDES += $(LOCAL_PATH)/multirom
 
     #MultiROM additions
-    LOCAL_ADDITIONAL_DEPENDENCIES += \
+    MultiROM_REQUIRED_MODULES += \
         zip \
         gnutar \
         lz4 \
@@ -551,6 +551,12 @@ ifeq ($(TARGET_RECOVERY_IS_MULTIROM), true)
         ls_xattrs \
         mount_shim.sh \
         umount_shim.sh
+
+    ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 28; echo $$?),0)
+        LOCAL_REQUIRED_MODULES += $(MultiROM_REQUIRED_MODULES)
+    else
+        LOCAL_ADDITIONAL_DEPENDENCIES += $(MultiROM_REQUIRED_MODULES)
+    endif
 endif
 
 ifneq ($(TARGET_ARCH), arm64)
