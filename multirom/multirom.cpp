@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cmath>
 
 // clone libbootimg to /system/extras/ from
 // https://github.com/Tasssadar/libbootimg.git
@@ -58,6 +59,8 @@ extern "C" {
 
 #include "../libblkid/include/blkid.h"
 #include "cp_xattrs/libcp_xattrs.h"
+
+#define MR_USE_ZERO_AS_ERASE 1
 
 std::string MultiROM::m_path = "";
 std::string MultiROM::m_boot_dev = "";
@@ -1459,6 +1462,8 @@ bool MultiROM::createFakeVendorImg(bool needs_vendor)
 
 #define MR_UPDATE_SCRIPT_PATH  "META-INF/com/google/android/"
 #define MR_UPDATE_SCRIPT_NAME  "META-INF/com/google/android/updater-script"
+#define MR_SYS_TRANS_LST_NAME  "system.transfer.list"
+#define MR_VND_TRANS_LST_NAME  "vendor.transfer.list"
 
 bool MultiROM::installFromFastbootImg(std::string rom, std::string file)
 {
@@ -1861,10 +1866,42 @@ bool MultiROM::prepareZIP(std::string& file, EdifyHacker *hacker, bool& restore_
 	else
 		gui_print("No need to change ZIP.\n");
 
+#ifdef MR_USE_ZERO_AS_ERASE
+	gui_print("Start to convert zero to erase in system.transfer.list...");
+	if(system_args("unzip %s \"%s\" -d /tmp", file.c_str(), MR_SYS_TRANS_LST_NAME) != 0){
+		gui_print("Failed to extract system.transfer.list. Or file does not exist\n");
+	} else {
+		if(system_args("sed -i \'s/erase/zero/g\' /tmp/%s", MR_SYS_TRANS_LST_NAME) != 0){
+			gui_print("Failed to convert system.transfer.list.\n");
+			goto exit;
+		}
+		if(system_args("cd /tmp && zip -u %s %s", file.c_str(), MR_SYS_TRANS_LST_NAME) != 0){
+			gui_print("Failed to update zip.\n");
+			goto exit;
+		}
+	}
+	gui_print("Start to convert zero to erase in vendor.transfer.list...");
+	if(system_args("unzip %s \"%s\" -d /tmp", file.c_str(), MR_VND_TRANS_LST_NAME) != 0){
+		gui_print("Failed to extract vender.transfer.list. Or file does not exist\n");
+	} else {
+		if(system_args("sed -i \'s/erase/zero/g\' /tmp/%s", MR_VND_TRANS_LST_NAME) != 0){
+			gui_print("Failed to convert vender.transfer.list.\n");
+			goto exit;
+		}
+		if(system_args("cd /tmp && zip -u %s %s", file.c_str(), MR_VND_TRANS_LST_NAME) != 0){
+			gui_print("Failed to update zip.\n");
+			goto exit;
+		}
+	}
+#endif	
+	
 	return true;
 
 exit:
 	free(script_data);
+#ifdef MR_USE_ZERO_AS_ERASE
+	system_args("rm /tmp/%s", MR_SYS_TRANS_LST_NAME);
+#endif
 #ifdef USE_MINZIP
 	mzCloseZipArchive(&zip);
 	sysReleaseMap(&map);
@@ -2218,10 +2255,12 @@ bool MultiROM::createSparseImage(const std::string& base, const char *img)
 	gui_print("Creating %s.sparse.img...\n", img);
 
 	int max_size_MB = 0;
+	int max_size_KB = 0;
 	std::string path = "/"; path += img;
 	TWPartition *part = PartitionManager.Find_Partition_By_Path(path);
 	if (part) {
 		max_size_MB = part->GetSizeRaw() / 1024 / 1024;
+		max_size_KB = std::ceil(part->GetSizeRaw() / 1024);
 		if(max_size_MB <= 0) {
 			gui_print("Failed to create %s image: invalid size (%dMB)\n", img, max_size_MB);
 			return false;
@@ -2248,9 +2287,9 @@ bool MultiROM::createSparseImage(const std::string& base, const char *img)
 		 !strcmp(img, "system") ||
 		 !strcmp(img, "vendor") ||
 		 !strcmp(img, "cache"))) {
-		snprintf(cmd, sizeof(cmd), "make_ext4fs -l %dM -a \"/%s\" -S %s \"%s/%s.sparse.img\"", max_size_MB, img, file_contexts, base.c_str(), img);
+		snprintf(cmd, sizeof(cmd), "make_ext4fs -l %dK -a \"/%s\" -S %s \"%s/%s.sparse.img\"", max_size_KB, img, file_contexts, base.c_str(), img);
 	} else {
-		snprintf(cmd, sizeof(cmd), "make_ext4fs -l %dM \"%s/%s.img\"", max_size_MB, base.c_str(), img);
+		snprintf(cmd, sizeof(cmd), "make_ext4fs -l %dK \"%s/%s.img\"", max_size_KB, base.c_str(), img);
 	}
 
 	LOGINFO("Creating sparse image with cmd: %s\n", cmd);
@@ -3889,7 +3928,7 @@ std::string MultiROM::getRecoveryVersion()
 std::string MultiROM::Create_LoopDevice(const std::string& ImageFile)
 {
 	std::string LoopDevice;
-	char dev_path[64];
+	char dev_path[256];
 	int device_fd = -1;
 	int file_fd = -1;
 	int loop_num;
@@ -3931,14 +3970,14 @@ std::string MultiROM::Create_LoopDevice(const std::string& ImageFile)
 		}
 	}
 
-	if (loop_num == MAX_LOOP_NUM) {
+	if (loop_num >= MAX_LOOP_NUM) {
 		LOGINFO("Failed to find suitable loop device number!\n");
 		goto createLoopDevice_exit;
 	}
 
 	LOGINFO("Create_loop_device: loop_num = %d\n", loop_num);
 
-	if (mknod(dev_path, S_IFBLK | 0777, makedev(7, loop_num)) < 0) {
+	if (mknod(dev_path, S_IFBLK | 0777, makedev(7, 8 * loop_num)) < 0) {
 		if (errno != EEXIST) {
 			LOGINFO("Failed to create loop file (%d: %s)\n", errno, strerror(errno));
 			goto createLoopDevice_exit;
