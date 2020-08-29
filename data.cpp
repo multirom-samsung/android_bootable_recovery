@@ -859,6 +859,14 @@ void DataManager::SetDefaultValues()
 		ostringstream defPct;
 		defPct << defPctInt;
 		mPersist.SetValue("tw_brightness_pct", defPct.str());
+#ifdef TARGET_RECOVERY_IS_MULTIROM
+		int multirom_defValInt = GetIntValue("tw_multirom_brightness");
+		// Deliberately int so the % is always a whole number
+		int multirom_defPctInt = ( ( (double)multirom_defValInt / maxValInt ) * 100 );
+		ostringstream multirom_defPct;
+		multirom_defPct << multirom_defPctInt;
+		mPersist.SetValue("tw_multirom_brightness_pct", multirom_defPct.str());
+#endif
 
 		ostringstream defVal;
 		defVal << TW_DEFAULT_BRIGHTNESS;

@@ -760,14 +760,16 @@
 				<action function="overlay">multirom_no_kexec_settings</action>
 			</button>
 
-			<text style="text_m_accent">
-				<placement x="%indent%" y="%row7_y%"/>
-				<text>Screen Brightness: %tw_multirom_brightness%</text>
-			</text>
-
 			<slidervalue>
-				<placement x="indent" y="%row7_y%" w="%content_width%"/>
-				<data variable="tw_multirom_brightness" min="30" max="255" showcurr="0" changeondrag="1" />
+				<placement x="indent" y="%row6a_y%" w="%content_width%"/>
+				<text>Boot Menu Brightness: %tw_multirom_brightness_pct%%</text>
+				<data variable="tw_multirom_brightness_pct" min="30" max="100"/>
+				<actions>
+					<action function="set">tw_multirom_brightness=%tw_brightness_max%</action>
+					<action function="compute">tw_multirom_brightness*%tw_multirom_brightness_pct%</action>
+					<action function="compute">tw_multirom_brightness/100</action>
+					<action function="multirom_settings_save"/>
+				</actions>
 			</slidervalue>
 
 			<text style="text_m_accent">
