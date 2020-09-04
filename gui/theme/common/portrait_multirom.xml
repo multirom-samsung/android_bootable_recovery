@@ -772,14 +772,13 @@
 				</actions>
 			</slidervalue>
 
-			<text style="text_m_accent">
-				<placement x="%indent%" y="%row10_y%"/>
-				<text>Animation Duration: %tw_anim_duration_coef_pct%%</text>
-			</text>
-
 			<slidervalue>
 				<placement x="indent" y="%row10_y%" w="%content_width%"/>
-				<data variable="tw_anim_duration_coef_pct" min="50" max="125" showcurr="0" changeondrag="1" />
+				<text>Animation Duration:</text>
+				<data variable="tw_anim_duration_coef_pct" min="50" max="125"/>
+				<actions>
+					<action function="multirom_settings_save"/>
+				</actions>
 			</slidervalue>
 
 			<action>
