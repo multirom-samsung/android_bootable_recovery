@@ -456,7 +456,6 @@ bool EdifyHacker::add(char c)
         }
         case ST_STRING:
         {
-            size_t len = m_buf.size();
             m_buf += c;
             if(c == '"' && !m_strEscaped)
             {

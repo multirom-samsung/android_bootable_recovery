@@ -77,7 +77,7 @@ int read_data(ZipArchiveHandle zip, ZipEntry entry, char** ppData, size_t* pLeng
     }
     char *data = (char*)malloc(len + 1);
     if (data == NULL) {
-        LOGE("Can't allocate %d bytes for data\n", len + 1);
+        LOGE("Can't allocate %zd bytes for data\n", len + 1);
         return -2;
     }
 #ifdef USE_MINZIP

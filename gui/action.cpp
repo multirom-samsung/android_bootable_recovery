@@ -1951,9 +1951,9 @@ int GUIAction::checkpartitionlifetimewrites(std::string arg)
 }
 
 #ifdef TARGET_RECOVERY_IS_MULTIROM
-int GUIAction::rotation(std::string arg)
+int GUIAction::rotation(std::string arg __unused)
 {
-	int rot = atoi(arg.c_str());
+////	int rot = atoi(arg.c_str());
 //TODO
 ////	if(rot == gr_get_rotation())
 		return 0;
@@ -2170,7 +2170,7 @@ int GUIAction::multirom_add_file_selected(std::string arg __unused)
 		DataManager::SetValue("tw_mrom_back", "multirom_add");
 		DataManager::SetValue("tw_mrom_text2", "");
 
-		std:string ex;
+		std::string ex;
 		MROMInstaller *i = new MROMInstaller();
 
 		DataManager::SetValue("tw_mrom_title", "Bad installer");

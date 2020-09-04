@@ -1470,7 +1470,6 @@ void TWFunc::trim(std::string& str)
 int64_t TWFunc::getFreeSpace(const std::string& path)
 {
 	struct statfs buf; /* allocate a buffer */
-	int rc;
 
 	if (statfs(path.c_str(), &buf) < 0)
 		return -1;

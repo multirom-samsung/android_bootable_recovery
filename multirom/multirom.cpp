@@ -1505,7 +1505,6 @@ bool MultiROM::flashZip(std::string rom, std::string file)
 	EdifyHacker hacker;
 	std::string boot, sysimg, loop_device;
 	DIR *dp_keep_busy[4] = { NULL, NULL, NULL, NULL };
-	TWPartition *data, *sys;
 
 	gui_print("Flashing ZIP file %s\n", file.c_str());
 	gui_print("ROM: %s\n", rom.c_str());
@@ -1757,15 +1756,11 @@ bool MultiROM::verifyZIP(const std::string& file, int &verify_status)
 
 bool MultiROM::prepareZIP(std::string& file, EdifyHacker *hacker, bool& restore_script)
 {
-	bool res = false;
-
 #ifndef USE_MINZIP
 	ZipString zip_string(MR_UPDATE_SCRIPT_NAME);
 #endif
 	size_t script_len;
 	char* script_data = NULL;
-	int itr = 0;
-	bool changed = false;
 
 	system("rm /tmp/mr_update.zip");
 
@@ -3333,7 +3328,6 @@ bool MultiROM::ubuntuTouchProcess(const std::string& root, const std::string& na
 
 bool MultiROM::sailfishProcessBoot(const std::string& root)
 {
-	int rd_cmpr;
 	struct bootimg img;
 	bool res = false;
 

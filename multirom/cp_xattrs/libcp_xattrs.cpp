@@ -35,14 +35,14 @@ static bool cp_xattrs_list_xattrs_callback(const std::string& from,
     }
     else if(list_size > 16*1024)
     {
-        fprintf(stderr, "Failed to llistxattr: list is too long! %s (%d)", from.c_str(), list_size);
+        fprintf(stderr, "Failed to llistxattr: list is too long! %s (%zd)", from.c_str(), list_size);
         return false;
     }
 
     if(list_size > (ssize_t)sizeof(static_names))
     {
         names = (char*)malloc(list_size);
-        printf("alloc names %d\n", list_size);
+        printf("alloc names %zd\n", list_size);
     }
 
     list_size = llistxattr(from.c_str(), names, list_size);
@@ -65,7 +65,7 @@ static bool cp_xattrs_list_xattrs_callback(const std::string& from,
 
         if(value_size > 16*1024)
         {
-            fprintf(stderr, "Failed to lgetxattr: value is too long! %s (%d)", from.c_str(), value_size);
+            fprintf(stderr, "Failed to lgetxattr: value is too long! %s (%zd)", from.c_str(), value_size);
             return false;
         }
 
@@ -75,7 +75,7 @@ static bool cp_xattrs_list_xattrs_callback(const std::string& from,
                 data = NULL;
             data_size = value_size;
             data = (char*)realloc(data, data_size);
-            printf("alloc data %d\n", data_size);
+            printf("alloc data %zd\n", data_size);
         }
 
         res = lgetxattr(from.c_str(), names_itr, data, value_size);
