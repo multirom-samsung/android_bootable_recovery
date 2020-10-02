@@ -845,7 +845,7 @@ static bool MakeMultiROMRecoveryFstab(void)
 	std::string fstab_filename_bak = "/etc/twrp.fstab.bak";
 	if (!TWFunc::Path_Exists(fstab_filename)) {
 		fstab_filename = "/etc/recovery.fstab";
-		fstab_filename_bak = "/etc/twrp.fstab.bak";
+		fstab_filename_bak = "/etc/recovery.fstab.bak";
 	}
 
 
