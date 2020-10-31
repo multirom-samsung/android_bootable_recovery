@@ -3206,8 +3206,10 @@ string TWPartitionManager::Get_Active_Slot_Display() {
 }
 
 string TWPartitionManager::Get_Android_Root_Path() {
+#ifndef TARGET_RECOVERY_IS_MULTIROM
 	if (property_get_bool("ro.twrp.sar", false))
 		return "/system_root";
+#endif
 	return "/system";
 }
 
