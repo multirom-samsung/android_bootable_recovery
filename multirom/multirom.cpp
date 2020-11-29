@@ -925,11 +925,8 @@ bool MultiROM::changeMounts(std::string name, bool needs_vendor)
 
 	PartitionManager.Copy_And_Push_Context();
 
-#ifndef MR_DEVICE_HAS_VENDOR_PARTITION
-	TWPartition *realdata, *data, *sys, *cache;
-#else
 	TWPartition *realdata, *data, *sys, *cache, *vendor = nullptr;
-#endif
+
 	std::vector<TWPartition*>& parts = PartitionManager.getPartitions();
 	for(std::vector<TWPartition*>::iterator itr = parts.begin(); itr != parts.end();) {
 		if ((*itr)->Mount_Point == "/system") {
@@ -2323,7 +2320,7 @@ bool MultiROM::createSparseImage(const std::string& base, const char *img)
 	// make sparse files and format it ext4
 	char cmd[256];
 
-	char* file_contexts = NULL;
+	const char* file_contexts = NULL;
 
 	if (!access("/file_contexts", F_OK)) {
 		file_contexts = "/file_contexts";
