@@ -413,6 +413,7 @@ protected:
 	int installapp(std::string arg);
 	int uninstalltwrpsystemapp(std::string arg);
 	int repackimage(std::string arg);
+	int reflashtwrp(std::string arg);
 	int fixabrecoverybootloop(std::string arg);
 	int changeterminal(std::string arg);
 #ifndef TW_EXCLUDE_NANO
