@@ -26,7 +26,10 @@
 #include "exclude.hpp"
 #include "tw_atomic.hpp"
 #include "progresstracking.hpp"
+
+#ifdef USE_EXT4
 #include "ext4crypt_tar.h"
+#endif
 
 #ifdef TARGET_RECOVERY_IS_MULTIROM
 #include <list>
