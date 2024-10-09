@@ -2253,6 +2253,7 @@ bool MultiROM::createImage(const std::string& base, const char *img, int size)
 		return false;
 	}
 
+#ifdef USE_EXT4
 	char cmd[256];
 
 	// make_ext4fs errors out if it has unknown path
@@ -2268,6 +2269,49 @@ bool MultiROM::createImage(const std::string& base, const char *img, int size)
 
 	LOGINFO("Creating image with cmd: %s\n", cmd);
 	return system(cmd) == 0;
+#else
+	std::string img_path = base + "/" + img + ".img";
+	std::string img_mount_point = std::string("/") + img;
+
+	char dout[16];
+	sprintf(dout, "%d", size * 1024);
+
+	string size_str = dout;
+	string Command;
+
+	struct selabel_handle *selinux_handle = NULL;
+
+	// Execute mke2fs to create empty ext4 filesystem
+	Command = "mke2fs -t ext4 -b 4096 " + img_path + " " + size_str;
+	LOGINFO("mke2fs command: %s\n", Command.c_str());
+	int ret = TWFunc::Exec_Cmd(Command);
+	if (ret) {
+	        LOGINFO("Unable Create image: %s\n", img);
+		return false;
+	}
+
+	if (TWFunc::Path_Exists("/sbin/e2fsdroid")) {
+		const string& File_Contexts_Entry = (img_mount_point == "/system_root" ? "/" : img_mount_point);
+		char *secontext = NULL;
+		if (!selinux_handle || selabel_lookup(selinux_handle, &secontext, File_Contexts_Entry.c_str(), S_IFDIR) < 0) {
+			LOGINFO("Cannot lookup security context for '%s'\n", img_mount_point.c_str());
+		} else {
+			// Execute e2fsdroid to initialize selinux context
+			Command = "e2fsdroid -e -S /file_contexts -a " + File_Contexts_Entry + " " + img_path;
+			LOGINFO("e2fsdroid command: %s\n", Command.c_str());
+			ret = TWFunc::Exec_Cmd(Command);
+			if (ret) {
+	        		LOGINFO("Unable Create image: %s\n", img);
+				return false;
+			}
+		}
+	} else {
+		LOGINFO("e2fsdroid not present\n");
+	}
+
+	LOGINFO("Creating image: %s\n", img);
+	return true;
+#endif
 }
 
 bool MultiROM::createImagesFromBase(const std::string& base)
@@ -2324,6 +2368,7 @@ bool MultiROM::createSparseImage(const std::string& base, const char *img)
 		return false;
 	}
 
+#ifdef USE_EXT4
 	// make sparse files and format it ext4
 	char cmd[256];
 
@@ -2348,6 +2393,49 @@ bool MultiROM::createSparseImage(const std::string& base, const char *img)
 
 	LOGINFO("Creating sparse image with cmd: %s\n", cmd);
 	return system(cmd) == 0;
+#else
+	std::string img_path = base + "/" + img + ".sparse.img";
+	std::string img_mount_point = std::string("/") + img;
+
+	char dout[16];
+	sprintf(dout, "%d", max_size_KB);
+
+	string size_str = dout;
+	string Command;
+
+	struct selabel_handle *selinux_handle = NULL;
+
+	Command = "mke2fs -O sparse_super -t ext4 -b 4096 " + img_path + " " + size_str;
+	LOGINFO("mke2fs command: %s\n", Command.c_str());
+	int ret;
+	ret = TWFunc::Exec_Cmd(Command);
+	if (ret) {
+	        LOGINFO("Unable Create image: %s\n", img);
+		return false;
+	}
+
+	if (TWFunc::Path_Exists("/sbin/e2fsdroid")) {
+		const string& File_Contexts_Entry = (img_mount_point == "/system_root" ? "/" : img_mount_point);
+		char *secontext = NULL;
+		if (!selinux_handle || selabel_lookup(selinux_handle, &secontext, File_Contexts_Entry.c_str(), S_IFDIR) < 0) {
+			LOGINFO("Cannot lookup security context for '%s'\n", img_mount_point.c_str());
+		} else {
+			// Execute e2fsdroid to initialize selinux context
+			Command = "e2fsdroid -e -S /file_contexts -a " + File_Contexts_Entry + " " + img_path;
+			LOGINFO("e2fsdroid command: %s\n", Command.c_str());
+			ret = TWFunc::Exec_Cmd(Command);
+			if (ret) {
+	        		LOGINFO("Unable Create image: %s\n", img);
+				return false;
+			}
+		}
+	} else {
+		LOGINFO("e2fsdroid not present\n");
+	}
+
+	LOGINFO("Creating image: %s\n", img);
+	return true;
+#endif
 }
 
 bool MultiROM::createDirsFromBase(const string& base)
