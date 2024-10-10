@@ -1163,7 +1163,7 @@ void MultiROM::restoreMounts()
 
 	// Disassociate and unmount 'leftover' loop mounts (su, magisk, etc.)
 	list_loop_devices.clear();
-	TWFunc::Exec_Cmd("losetup -a 2>/dev/null", list_loop_devices);
+	TWFunc::Exec_Cmd("losetup -a 2>/dev/null", list_loop_devices, false);
 	ss << list_loop_devices;
 	while (getline(ss, line)) {
 		size_t pos = line.find_first_of(':');
@@ -1264,7 +1264,7 @@ void MultiROM::restoreMounts()
 
 	// Disassociate any remaining loop mounts
 	list_loop_devices.clear();
-	TWFunc::Exec_Cmd("losetup -a 2>/dev/null", list_loop_devices);
+	TWFunc::Exec_Cmd("losetup -a 2>/dev/null", list_loop_devices, false);
 	ss << list_loop_devices;
 	while (getline(ss, line)) {
 		size_t pos = line.find_first_of(':');
@@ -3569,7 +3569,7 @@ int MultiROM::getTrampolineVersion(const std::string& path, bool silent)
 		return -1;
 	}
 
-	if(TWFunc::Exec_Cmd(cmd, result) != 0)
+	if(TWFunc::Exec_Cmd(cmd, result, false) != 0)
 	{
 		if(!silent)
 			gui_print("Failed to get trampoline version!\n");
