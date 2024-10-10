@@ -858,6 +858,10 @@ static bool MakeMultiROMRecoveryFstab(void)
 	std::string fstab_filename = "/etc/twrp.fstab";
 	std::string fstab_filename_bak = "/etc/twrp.fstab.bak";
 	if (!TWFunc::Path_Exists(fstab_filename)) {
+		fstab_filename = "/etc/twrp.flags";
+		fstab_filename_bak = "/etc/twrp.flags.bak";
+	}
+	if (!TWFunc::Path_Exists(fstab_filename)) {
 		fstab_filename = "/etc/recovery.fstab";
 		fstab_filename_bak = "/etc/recovery.fstab.bak";
 	}
@@ -1147,6 +1151,9 @@ void MultiROM::restoreMounts()
 	}
 
 	std::string fstab_filename = "/etc/twrp.fstab";
+	if (!TWFunc::Path_Exists(fstab_filename))
+		fstab_filename = "/etc/twrp.flags";
+
 	if (!TWFunc::Path_Exists(fstab_filename))
 		fstab_filename = "/etc/recovery.fstab";
 
