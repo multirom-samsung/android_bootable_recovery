@@ -938,7 +938,7 @@ void DataManager::SetDefaultValues()
 		}
 
 		//res.insert(0, "_"); //we dont want that forced in the xml
-		SetValue(TW_MROM_REC_VERSION_VAR, res);
+		mConst.SetValue(TW_MROM_REC_VERSION_VAR, res);
 	}
 #endif
 
