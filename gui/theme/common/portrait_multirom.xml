@@ -25,7 +25,7 @@
 			</text>
 
 			<button style="main_button_half_height">
-				<placement x="%indent%" y="%row18a_y%"/>
+				<placement x="%indent%" y="%row21a_y%"/>
 				<text>{@back_btn=Back}</text>
 				<action function="page">%tw_mrom_back%</action>
 			</button>
@@ -260,227 +260,189 @@
 				</actions>
 			</button>
 
-			<button style="main_button_half_height">
-				<conditions>
+			<listbox style="advanced_listbox">
+				<placement x="%indent%" y="%row9a_y%" w="%content_width%" h="%listbox_advanced_height%"/>
+				<listitem name="Wipe Dalvik">
 					<condition var1="tw_multirom_is_android" var2="1"/>
-					<condition var1="tw_multirom_has_bootimg" var2="0"/>
-				</conditions>
-				<placement x="%indent%" y="%row8a_y%"/>
-				<text>Add Boot.img</text>
-				<actions>
-					<action function="set">tw_multirom_add_bootimg=1</action>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_inject</action>
-					<action function="set">tw_text1=Add/replace boot.img</action>
-					<action function="set">tw_text3=to rom %tw_multirom_rom%?</action>
-					<action function="set">tw_multirom_set_fw=0</action>
-					<action function="page">multirom_inject_select</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<conditions>
+					<actions>
+						<action function="set">tw_multirom_wipe=dalvik</action>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_wipe</action>
+						<action function="set">tw_text1=Wipe dalvik-cache for ROM:</action>
+						<action function="set">tw_text2=%tw_multirom_rom_name%</action>
+						<action function="set">tw_action_text1=Wiping..</action>
+						<action function="set">tw_complete_text1=dalvik-cache wiped!</action>
+						<action function="set">tw_slider_text=Swipe to Confirm</action>
+						<action function="set">tw_show_reboot=0</action>
+						<action function="page">confirm_action</action>
+					</actions>
+				</listitem>
+				<listitem name="Wipe Cache">
 					<condition var1="tw_multirom_is_android" var2="1"/>
-					<condition var1="tw_multirom_has_bootimg" var2="1"/>
-				</conditions>
-				<placement x="%indent%" y="%row8a_y%"/>
-				<text>Remove Boot.img</text>
-				<actions>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_rm_bootimg</action>
-					<action function="set">tw_text1=Remove boot.img from ROM:</action>
-					<action function="set">tw_text2=%tw_multirom_rom_name%</action>
-					<action function="set">tw_action_text1=Removing...</action>
-					<action function="set">tw_complete_text1=boot.img was removed!</action>
-					<action function="set">tw_slider_text=Swipe to Confirm</action>
-					<action function="set">tw_show_reboot=0</action>
-					<action function="page">confirm_action</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<condition var1="tw_multirom_is_android" var2="1"/>
-				<placement x="%center_x%" y="%row8a_y%"/>
-				<text>Wipe Dalvik</text>
-				<actions>
-					<action function="set">tw_multirom_wipe=dalvik</action>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_wipe</action>
-					<action function="set">tw_text1=Wipe dalvik-cache for ROM:</action>
-					<action function="set">tw_text2=%tw_multirom_rom_name%</action>
-					<action function="set">tw_action_text1=Wiping..</action>
-					<action function="set">tw_complete_text1=dalvik-cache wiped!</action>
-					<action function="set">tw_slider_text=Swipe to Confirm</action>
-					<action function="set">tw_show_reboot=0</action>
-					<action function="page">confirm_action</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<conditions>
-					<condition var1="tw_multirom_has_fw_partition" var2="1"/>
-					<condition var1="tw_multirom_has_fw_image" var2="0"/>
-				</conditions>
-				<placement x="%indent%" y="%row11a_y%"/>
-				<text>Set Radio.img</text>
-				<actions>
-					<action function="set">tw_multirom_add_bootimg=0</action>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_set_fw</action>
-					<action function="set">tw_text1=Set radio image</action>
-					<action function="set">tw_text3=?</action>
-					<action function="set">tw_multirom_set_fw=1</action>
-					<action function="page">multirom_inject_select</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<conditions>
-					<condition var1="tw_multirom_has_fw_partition" var2="1"/>
-					<condition var1="tw_multirom_has_fw_image" var2="1"/>
-				</conditions>
-				<placement x="%indent%" y="%row11a_y%"/>
-				<text>Remove Radio.img</text>
-				<actions>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_remove_fw</action>
-					<action function="set">tw_action_text1=Removing radio.img...</action>
-					<action function="set">tw_complete_text1=Please wait.</action>
-					<action function="page">action_page</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<condition var1="tw_multirom_is_android" var2="1"/>
-				<placement x="%center_x%" y="%row11a_y%"/>
-				<text>Wipe Cache</text>
-				<actions>
-					<action function="set">tw_multirom_wipe=cache</action>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_wipe</action>
-					<action function="set">tw_text1=Wipe cache for ROM:</action>
-					<action function="set">tw_text2=%tw_multirom_rom_name%</action>
-					<action function="set">tw_action_text1=Wiping..</action>
-					<action function="set">tw_complete_text1=/cache wiped!</action>
-					<action function="set">tw_slider_text=Swipe to Confirm</action>
-					<action function="set">tw_show_reboot=0</action>
-					<action function="page">confirm_action</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<condition var1="tw_multirom_is_android" var2="1"/>
-				<placement x="%indent%" y="%row14a_y%"/>
-				<text>{@adb_sideload_btn=ADB Sideload}</text>
-				<actions>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_sideload</action>
-					<action function="set">tw_action_text1=ADB Sideload</action>
-					<action function="set">tw_action_text2=Usage: adb sideload filename.zip</action>
-					<action function="set">tw_complete_text1=ADB Sideload Complete</action>
-					<action function="set">tw_has_cancel=1</action>
-					<action function="set">tw_cancel_action=adbsideloadcancel</action>
-					<action function="set">tw_mrom_next_page=multirom_sideload_complete</action>
-					<action function="page">action_page</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<condition var1="tw_multirom_is_android" var2="1"/>
-				<placement x="%center_x%" y="%row14a_y%"/>
-				<text>{@install_zip_btn=Install Zip}</text>
-				<actions>
-					<action function="set">tw_mrom_flash_action=multirom_flash_zip</action>
-					<action function="set">tw_mrom_rom_is_zip=1</action>
-					<action function="page">multirom_flash_select</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<condition var1="tw_multirom_is_android" var2="1"/>
-				<placement x="%indent%" y="%row17a_y%"/>
-				<text>Run Restorecon</text>
-				<actions>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_restorecon</action>
-					<action function="set">tw_text1=Run restorecon on "%tw_multirom_rom_name%"?</action>
-					<action function="set">tw_action_text1=Running restorecon</action>
-					<action function="set">tw_complete_text1=SELinux contexts were restored</action>
-					<action function="set">tw_slider_text=Swipe to Confirm</action>
-					<action function="set">tw_show_reboot=0</action>
-					<action function="page">confirm_action</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<condition var1="tw_multirom_is_ubuntu" var2="1"/>
-				<placement x="%center_x%" y="%row17a_y%"/>
-				<text>Re-patch init</text>
-				<actions>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_ubuntu_patch_init</action>
-					<action function="set">tw_text1=Patch ubuntu's init?</action>
-					<action function="set">tw_action_text1=Patching...</action>
-					<action function="set">tw_complete_text1=Init patched</action>
-					<action function="set">tw_slider_text=Swipe to Confirm</action>
-					<action function="set">tw_show_reboot=0</action>
-					<action function="page">confirm_action</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<condition var1="tw_multirom_is_touch" var2="1"/>
-				<placement x="%center_x%" y="%row17a_y%"/>
-				<text>Re-patch init</text>
-				<actions>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_touch_patch_init</action>
-					<action function="set">tw_text1=Patch Ubuntu Touch's init?</action>
-					<action function="set">tw_action_text1=Patching...</action>
-					<action function="set">tw_complete_text1=Init patched</action>
-					<action function="set">tw_slider_text=Swipe to Confirm</action>
-					<action function="set">tw_show_reboot=0</action>
-					<action function="page">confirm_action</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<condition var1="tw_multirom_is_android" var2="1"/>
-				<placement x="%center_x%" y="%row17a_y%"/>
-				<text>Install System.img</text>
-				<actions>
-					<action function="set">tw_mrom_flash_action=multirom_flash_system_img</action>
-					<action function="set">tw_mrom_rom_is_zip=0</action>
-					<action function="page">multirom_flash_select</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<condition var1="tw_multirom_is_android" var2="1"/>
-				<placement x="%indent%" y="%row20a_y%"/>
-				<text>Install Vendor.img</text>
-				<actions>
-					<action function="set">tw_mrom_flash_action=multirom_flash_vendor_img</action>
-					<action function="set">tw_mrom_rom_is_zip=0</action>
-					<action function="page">multirom_flash_select</action>
-				</actions>
-			</button>
-
-			<button style="main_button_half_height">
-				<condition var1="tw_multirom_is_ubuntu" var2="1"/>
-				<placement x="%center_x%" y="%row20a_y%"/>
-				<text>Disable flash-kernel</text>
-				<actions>
-					<action function="set">tw_back=multirom_manage</action>
-					<action function="set">tw_action=multirom_disable_flash_kernel</action>
-					<action function="set">tw_text1=Disable flash-kernel?</action>
-					<action function="set">tw_action_text1=Working...</action>
-					<action function="set">tw_complete_text1=Flash-kernel patched</action>
-					<action function="set">tw_slider_text=Swipe to Confirm</action>
-					<action function="set">tw_show_reboot=0</action>
-					<action function="page">confirm_action</action>
-				</actions>
-			</button>
+					<actions>
+						<action function="set">tw_multirom_wipe=cache</action>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_wipe</action>
+						<action function="set">tw_text1=Wipe cache for ROM:</action>
+						<action function="set">tw_text2=%tw_multirom_rom_name%</action>
+						<action function="set">tw_action_text1=Wiping..</action>
+						<action function="set">tw_complete_text1=/cache wiped!</action>
+						<action function="set">tw_slider_text=Swipe to Confirm</action>
+						<action function="set">tw_show_reboot=0</action>
+						<action function="page">confirm_action</action>
+					</actions>
+				</listitem>
+				<listitem name="Add Boot.img">
+					<conditions>
+						<condition var1="tw_multirom_is_android" var2="1"/>
+						<condition var1="tw_multirom_has_bootimg" var2="0"/>
+					</conditions>
+					<actions>
+						<action function="set">tw_multirom_add_bootimg=1</action>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_inject</action>
+						<action function="set">tw_text1=Add/replace boot.img</action>
+						<action function="set">tw_text3=to rom %tw_multirom_rom%?</action>
+						<action function="set">tw_multirom_set_fw=0</action>
+						<action function="page">multirom_inject_select</action>
+					</actions>
+				</listitem>
+				<listitem name="Remove Boot.img">
+					<conditions>
+						<condition var1="tw_multirom_is_android" var2="1"/>
+						<condition var1="tw_multirom_has_bootimg" var2="1"/>
+					</conditions>
+					<actions>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_rm_bootimg</action>
+						<action function="set">tw_text1=Remove boot.img from ROM:</action>
+						<action function="set">tw_text2=%tw_multirom_rom_name%</action>
+						<action function="set">tw_action_text1=Removing...</action>
+						<action function="set">tw_complete_text1=boot.img was removed!</action>
+						<action function="set">tw_slider_text=Swipe to Confirm</action>
+						<action function="set">tw_show_reboot=0</action>
+						<action function="page">confirm_action</action>
+					</actions>
+				</listitem>
+				<listitem name="Set Radio.img">
+					<conditions>
+						<condition var1="tw_multirom_has_fw_partition" var2="1"/>
+						<condition var1="tw_multirom_has_fw_image" var2="0"/>
+					</conditions>
+					<actions>
+						<action function="set">tw_multirom_add_bootimg=0</action>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_set_fw</action>
+						<action function="set">tw_text1=Set radio image</action>
+						<action function="set">tw_text3=?</action>
+						<action function="set">tw_multirom_set_fw=1</action>
+						<action function="page">multirom_inject_select</action>
+					</actions>
+				</listitem>
+				<listitem name="Remove Radio.img">
+					<conditions>
+						<condition var1="tw_multirom_has_fw_partition" var2="1"/>
+						<condition var1="tw_multirom_has_fw_image" var2="1"/>
+					</conditions>
+					<actions>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_remove_fw</action>
+						<action function="set">tw_action_text1=Removing radio.img...</action>
+						<action function="set">tw_complete_text1=Please wait.</action>
+						<action function="page">action_page</action>
+					</actions>
+				</listitem>
+				<listitem name="Install System.img">
+					<condition var1="tw_multirom_is_android" var2="1"/>
+					<actions>
+						<action function="set">tw_mrom_flash_action=multirom_flash_system_img</action>
+						<action function="set">tw_mrom_rom_is_zip=0</action>
+						<action function="page">multirom_flash_select</action>
+					</actions>
+				</listitem>
+				<listitem name="Install Vendor.img">
+					<condition var1="tw_multirom_is_android" var2="1"/>
+					<actions>
+						<action function="set">tw_mrom_flash_action=multirom_flash_vendor_img</action>
+						<action function="set">tw_mrom_rom_is_zip=0</action>
+						<action function="page">multirom_flash_select</action>
+					</actions>
+				</listitem>
+				<listitem name="{@adb_sideload_btn=ADB Sideload}">
+					<condition var1="tw_multirom_is_android" var2="1"/>
+					<actions>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_sideload</action>
+						<action function="set">tw_action_text1=ADB Sideload</action>
+						<action function="set">tw_action_text2=Usage: adb sideload filename.zip</action>
+						<action function="set">tw_complete_text1=ADB Sideload Complete</action>
+						<action function="set">tw_has_cancel=1</action>
+						<action function="set">tw_cancel_action=adbsideloadcancel</action>
+						<action function="set">tw_mrom_next_page=multirom_sideload_complete</action>
+						<action function="page">action_page</action>
+					</actions>
+				</listitem>
+				<listitem name="{@install_zip_btn=Install Zip}">
+					<condition var1="tw_multirom_is_android" var2="1"/>
+					<actions>
+						<action function="set">tw_mrom_flash_action=multirom_flash_zip</action>
+						<action function="set">tw_mrom_rom_is_zip=1</action>
+						<action function="page">multirom_flash_select</action>
+					</actions>
+				</listitem>
+				<listitem name="Re-patch init">
+					<condition var1="tw_multirom_is_ubuntu" var2="1"/>
+					<actions>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_ubuntu_patch_init</action>
+						<action function="set">tw_text1=Patch ubuntu's init?</action>
+						<action function="set">tw_action_text1=Patching...</action>
+						<action function="set">tw_complete_text1=Init patched</action>
+						<action function="set">tw_slider_text=Swipe to Confirm</action>
+						<action function="set">tw_show_reboot=0</action>
+						<action function="page">confirm_action</action>
+					</actions>
+				</listitem>
+				<listitem name="Re-patch init">
+					<condition var1="tw_multirom_is_touch" var2="1"/>
+					<actions>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_touch_patch_init</action>
+						<action function="set">tw_text1=Patch Ubuntu Touch's init?</action>
+						<action function="set">tw_action_text1=Patching...</action>
+						<action function="set">tw_complete_text1=Init patched</action>
+						<action function="set">tw_slider_text=Swipe to Confirm</action>
+						<action function="set">tw_show_reboot=0</action>
+						<action function="page">confirm_action</action>
+					</actions>
+				</listitem>
+				<listitem name="Disable flash-kernel">
+					<condition var1="tw_multirom_is_ubuntu" var2="1"/>
+					<actions>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_disable_flash_kernel</action>
+						<action function="set">tw_text1=Disable flash-kernel?</action>
+						<action function="set">tw_action_text1=Working...</action>
+						<action function="set">tw_complete_text1=Flash-kernel patched</action>
+						<action function="set">tw_slider_text=Swipe to Confirm</action>
+						<action function="set">tw_show_reboot=0</action>
+						<action function="page">confirm_action</action>
+					</actions>
+				</listitem>
+				<listitem name="Run Restorecon">
+					<condition var1="tw_multirom_is_android" var2="1"/>
+					<actions>
+						<action function="set">tw_back=multirom_manage</action>
+						<action function="set">tw_action=multirom_restorecon</action>
+						<action function="set">tw_text1=Run restorecon on "%tw_multirom_rom_name%"?</action>
+						<action function="set">tw_action_text1=Running restorecon</action>
+						<action function="set">tw_complete_text1=SELinux contexts were restored</action>
+						<action function="set">tw_slider_text=Swipe to Confirm</action>
+						<action function="set">tw_show_reboot=0</action>
+						<action function="page">confirm_action</action>
+					</actions>
+				</listitem>
+			</listbox>
 
 			<text style="text_m">
 				<conditions>
