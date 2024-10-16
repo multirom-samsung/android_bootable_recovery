@@ -1092,7 +1092,7 @@ void GUIAction::reinject_after_flash()
 		}
 	}
 #ifdef TARGET_RECOVERY_IS_MULTIROM
-	if(DataManager::GetIntValue(TW_AUTO_INJECT_MROM) == 1 && MultiROM::folderExists())
+	if(DataManager::GetIntValue("tw_auto_inject_mrom") == 1 && MultiROM::folderExists())
 	{
 		gui_print("Injecting boot.img with MultiROM...\n");
 		if (MultiROM::injectBoot(MultiROM::getBootDev(), true))
